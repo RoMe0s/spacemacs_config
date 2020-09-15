@@ -30,13 +30,12 @@ values."
    dotspacemacs-configuration-layer-path '()
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(
-     php
+   '(php
      html
      elixir
      javascript
      ;; nginx
-     ;; yaml
+     yaml
      (gtags :variables
             gtags-enable-by-default t)
      ;; ----------------------------------------------------------------
@@ -44,7 +43,8 @@ values."
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     helm
+     ;; helm
+     ivy
      (auto-completion :variables
                       auto-completion-return-key-behavior 'complete
                       auto-completion-tab-key-behavior 'cycle
@@ -63,10 +63,10 @@ values."
             shell-default-position 'bottom
             shell-default-full-span nil)
      ;; spell-checking
-     (syntax-checking :variables
-                      syntax-checking-enable-tooltips nil)
-     ;; version-control
-     )
+     ;; (syntax-checking :variables
+                     ;; syntax-checking-enable-tooltips t)
+     version-control
+     treemacs)
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
@@ -76,8 +76,8 @@ values."
                                       ac-php
                                       yasnippet-snippets
                                       company-php
-                                      all-the-icons
-                                      dockerfile-mode
+                                      ;; all-the-icons
+                                      ;; dockerfile-mode
                                       ;; github-theme
                                       ;; dracula-theme
                                       ;; rebecca-theme
@@ -85,7 +85,7 @@ values."
                                       ;; gruvbox-theme
                                       ;; minimal-theme
                                       ;; doom-themes
-                                      highlight-indent-guides)
+                                      )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -164,8 +164,8 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font '("Hack"
-                               :size 19
+   dotspacemacs-default-font '("JetBrains Mono"
+                               :size 20
                                ;; :weight bold
                                ;; :width normal ;;expanded
                                :powerline-scale 1)
@@ -335,19 +335,21 @@ before packages are loaded. If you are unsure, you should try in setting them in
   )
 
 (defun dotspacemacs/user-config ()
-  (nyan-mode t)
   "Configuration function for user code.
 This function is called at the very end of Spacemacs initialization after
 layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
+  (nyan-mode t)
+  (savehist-mode -1)
+
   (defun save-all ()
     (interactive)
     (save-some-buffers t))
   (add-hook 'focus-out-hook 'save-all)
 
-  (spacemacs/set-leader-keys "/" 'helm-do-ag)
+  (spacemacs/set-leader-keys "/" 'helm-do-ag) ;;it's a global search
   (define-key evil-insert-state-map (kbd "<C-return> <C-return>") 'company-complete)
   (define-key evil-insert-state-map (kbd "<C-return> C-w") 'company-dabbrev)
   ;; php mode
@@ -375,19 +377,24 @@ you should place your code here."
   (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
   ;; end web mode
 
-  (setq treemacs-follow-mode nil)
+  ;; treemacs mode
+  (with-eval-after-load 'treemacs
+    ;; (treemacs-follow-mode -1) uncomment
+    ;; (treemacs-filewatch-mode -1)
+    (treemacs-tag-follow-mode -1))
+  ;; end treemacs mode
+
+
   (setq powerline-default-separator 'arrow)
   (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
   (setq inhibit-compacting-font-caches t)
   (setq company-minimum-prefix-length 2)
   (setq powerline-height 20)
-  (setq highlight-indent-guides-method 'column)
 
   (setq company-dabbrev-code-everywhere t)
   (setq company-dabbrev-code-other-buffers t)
   (setq-default js2-basic-offset 2)
-  (setq-default js-indent-level 2)
-  )
+  (setq-default js-indent-level 2))
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
@@ -402,7 +409,7 @@ you should place your code here."
  '(fci-rule-color "#3E4451" t)
  '(package-selected-packages
    (quote
-    (ag vue-mode docker tablist docker-tramp github-modern-theme magit-popup magit espresso-theme transient lv github-theme one-themes autumn-light-theme atom-dark-theme atom-one-dark-theme rainbow-mode molokai-theme kaolin-fusion-theme kaolin-themes underwater-theme creamsody-theme sunburn-theme doom-spacegray-theme dracula-theme prettify-greek pretty-symbols nyan-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl company-phpactor phpactor ede-php-autoload dockerfile-mode yaml-mode rebecca-theme nginx-mode treepy graphql doom-themes highlight-indent-guides material-theme twilight-bright-theme php-auto-yasnippets yasnippet-snippets xterm-color web-mode web-beautify unfill tagedit smeargle slim-mode shell-pop scss-mode sass-mode pug-mode phpunit phpcbf php-extras orgit ob-elixir mwim multi-term magit-gitflow lua-mode livid-mode skewer-mode simple-httpd less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc helm-gtags helm-gitignore helm-css-scss helm-company helm-c-yasnippet haml-mode gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link ggtags fuzzy flycheck-pos-tip pos-tip flycheck-mix flycheck-credo flycheck evil-magit git-commit ghub let-alist with-editor eshell-z eshell-prompt-extras esh-help emmet-mode drupal-mode company-web web-completion-data company-tern dash-functional tern company-statistics company-php coffee-mode auto-yasnippet all-the-icons memoize alchemist company elixir-mode ac-php yasnippet ac-php-core xcscope php-mode ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
+    (ag vue-mode docker tablist docker-tramp github-modern-theme magit-popup magit espresso-theme transient lv github-theme one-themes autumn-light-theme atom-dark-theme atom-one-dark-theme rainbow-mode molokai-theme kaolin-fusion-theme kaolin-themes underwater-theme creamsody-theme sunburn-theme doom-spacegray-theme dracula-theme prettify-greek pretty-symbols nyan-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl company-phpactor phpactor ede-php-autoload dockerfile-mode yaml-mode rebecca-theme nginx-mode treepy graphql doom-themes highlight-indent-guides material-theme twilight-bright-theme php-auto-yasnippets yasnippet-snippets xterm-color web-mode web-beautify unfill tagedit smeargle slim-mode shell-pop scss-mode sass-mode pug-mode phpunit phpcbf php-extras orgit ob-elixir mwim multi-term magit-gitflow lua-mode livid-mode skewer-mode simple-httpd less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc helm-gtags helm-gitignore helm-css-scss helm-company helm-c-yasnippet haml-mode gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link ggtags fuzzy flycheck-pos-tip pos-tip flycheck-credo flycheck evil-magit git-commit ghub let-alist with-editor eshell-z eshell-prompt-extras esh-help emmet-mode drupal-mode company-web web-completion-data dash-functional tern company-statistics company-php coffee-mode auto-yasnippet all-the-icons memoize alchemist company elixir-mode ac-php yasnippet ac-php-core xcscope php-mode ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
 This is an auto-generated function, do not modify its content directly, use
@@ -418,8 +425,7 @@ This function is called at the very end of Spacemacs initialization."
  '(evil-want-Y-yank-to-eol nil)
  '(fci-rule-color "#3E4451" t)
  '(hl-todo-keyword-faces
-   (quote
-    (("TODO" . "#dc752f")
+   '(("TODO" . "#dc752f")
      ("NEXT" . "#dc752f")
      ("THEM" . "#2d9574")
      ("PROG" . "#4f97d7")
@@ -433,14 +439,19 @@ This function is called at the very end of Spacemacs initialization."
      ("TEMP" . "#b1951d")
      ("FIXME" . "#dc752f")
      ("XXX" . "#dc752f")
-     ("XXXX" . "#dc752f")
-     ("???" . "#dc752f"))))
+     ("XXXX" . "#dc752f")))
  '(nrepl-message-colors
-   (quote
-    ("#183691" "#969896" "#a71d5d" "#969896" "#0086b3" "#795da3" "#a71d5d" "#969896")))
+   '("#183691" "#969896" "#a71d5d" "#969896" "#0086b3" "#795da3" "#a71d5d" "#969896"))
  '(package-selected-packages
-   (quote
-    (solarized-theme counsel-projectile company-phpactor phpactor ede-php-autoload dockerfile-mode yaml-mode rebecca-theme nginx-mode treepy graphql doom-themes highlight-indent-guides material-theme twilight-bright-theme php-auto-yasnippets yasnippet-snippets xterm-color web-mode web-beautify unfill tagedit smeargle slim-mode shell-pop scss-mode sass-mode pug-mode phpunit phpcbf php-extras orgit ob-elixir mwim multi-term magit-gitflow lua-mode livid-mode skewer-mode simple-httpd less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc helm-gtags helm-gitignore helm-css-scss helm-company helm-c-yasnippet haml-mode gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link ggtags fuzzy flycheck-pos-tip pos-tip flycheck-mix flycheck-credo flycheck evil-magit magit magit-popup git-commit ghub let-alist with-editor eshell-z eshell-prompt-extras esh-help emmet-mode drupal-mode company-web web-completion-data company-tern dash-functional tern company-statistics company-php coffee-mode auto-yasnippet all-the-icons memoize alchemist company elixir-mode ac-php yasnippet ac-php-core xcscope php-mode ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))))
+   '(oldlace-theme minsk-theme php-refactor-mode phps-mode solarized-theme counsel-projectile company-phpactor phpactor ede-php-autoload dockerfile-mode yaml-mode rebecca-theme nginx-mode treepy graphql doom-themes highlight-indent-guides material-theme twilight-bright-theme php-auto-yasnippets yasnippet-snippets xterm-color web-mode web-beautify unfill tagedit smeargle slim-mode shell-pop scss-mode sass-mode pug-mode phpunit phpcbf php-extras orgit ob-elixir mwim multi-term magit-gitflow lua-mode livid-mode skewer-mode simple-httpd less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc helm-gtags helm-gitignore helm-css-scss helm-company helm-c-yasnippet haml-mode gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link ggtags fuzzy flycheck-pos-tip pos-tip flycheck-credo flycheck evil-magit magit magit-popup git-commit ghub let-alist with-editor eshell-z eshell-prompt-extras esh-help emmet-mode drupal-mode company-web web-completion-data dash-functional tern company-statistics company-php coffee-mode auto-yasnippet all-the-icons memoize alchemist company elixir-mode ac-php yasnippet ac-php-core xcscope php-mode ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))
+ '(pdf-view-midnight-colors '("#655370" . "#fbf8ef")))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
